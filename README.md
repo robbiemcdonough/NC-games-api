@@ -6,12 +6,11 @@ We will be building an API for the purpose of accessing application data program
 
 Your database will be PSQL, and you will interact with it using [node-postgres](https://node-postgres.com/).
 
-## Create Environment Variables 
-In order to connect to the right database, we need to set up our environment variables.  In the /db file we can require dotenv into the file and invoke its config method. This sets all of the environment variables from the .env file to the process.env.
+## Setup Dev Environment 
+Once you have cloned down the project, be sure to run npm install to instal all the relevant packages. Most of what you need is there already, but you will additionally need to install express and supertest.
 
-require('dotenv').config();
-const { Pool } = require('pg');
+We'll have two databases in this project. One for real looking dev data and another for simpler test data.
 
-module.exports = new Pool();
-
-Note that if, for some reason, the PGDATABASE environment variable was not set correctly, node-postgres would connect to your default database rather than throwing an error. 
+You will need to create two .env files for your project: .env.test and .env.development. 
+Into .env.test add PGDATABASE=NC_games.test. 
+Into .env.development add PGDATABASE=NC_games. Double check that these .env files are .gitignored.
