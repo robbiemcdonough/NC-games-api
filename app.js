@@ -4,11 +4,13 @@ const {
   getCategories,
   getReviews,
   getReviewsByID,
+  getCommentsByReviewID,
 } = require("./controllers/controller");
 
 app.get("/api/categories", getCategories);
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReviewsByID);
+app.get('/api/reviews/:review_id/comments', getCommentsByReviewID)
 
 app.use((err, req, res, next) => {
   if (err.status && err.msg) {

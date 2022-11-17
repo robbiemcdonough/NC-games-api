@@ -102,3 +102,42 @@ describe("/api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("/api/review/:review_id/comments", () => {
+  test("GET 200 responds with comments array of specified review_id", () => {
+    const REVIEW_ID = 2;
+    return request(app)
+      .get(`/api/reviews/${REVIEW_ID}/comments`)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.review).toBeInstanceOf(Array);
+        expect(res.body.review.length).toBeGreaterThan(0);
+        res.body.review.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            review_id: REVIEW_ID,
+          });
+        });
+      });
+  });
+  test("400 review_id is not a number", () => {
+    return request(app)
+      .get("/api/reviews/banana/comments")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("review_id is not a number");
+      });
+  });
+  test("404 review_id is an invalid number", () => {
+    return request(app)
+      .get("/api/reviews/10000/comments")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("review_id is not found");
+      });
+  });
+});
