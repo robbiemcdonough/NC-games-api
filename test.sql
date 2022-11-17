@@ -6,4 +6,5 @@
 -- ORDER BY created_at DESC;
 
 
-SELECT * FROM reviews;
+SELECT * FROM comments WHERE review_id = 2
+ORDER BY created_at DESC;
