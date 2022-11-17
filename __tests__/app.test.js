@@ -3,6 +3,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
+const { get } = require("../app");
 
 beforeEach(() => {
   return seed(testData);
@@ -60,6 +61,44 @@ describe("/api/reviews", () => {
             comment_count: expect.any(Number),
           });
         });
+      });
+  });
+});
+
+describe("/api/reviews/:review_id", () => {
+  test("GET 200 responds with review object matching specified review_id", () => {
+    const REVIEW_ID = 1;
+    return request(app)
+      .get(`/api/reviews/${REVIEW_ID}`)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.review).toEqual({
+          review_id: REVIEW_ID,
+          title: expect.any(String),
+          review_body: expect.any(String),
+          designer: expect.any(String),
+          review_img_url: expect.any(String),
+          votes: expect.any(Number),
+          category: expect.any(String),
+          owner: expect.any(String),
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("400 review_id is not a number", () => {
+    return request(app)
+      .get("/api/reviews/banana")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("review_id is not a number");
+      });
+  });
+  test("404 review_id is an invalid number", () => {
+    return request(app)
+      .get("/api/reviews/10000")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("review_id is not found");
       });
   });
 });

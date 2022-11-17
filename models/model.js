@@ -11,3 +11,18 @@ exports.fetchReviews = () => {
     )
     .then((result) => result.rows);
 };
+
+exports.fetchReviewsByID = (review_id) => {
+  if (isNaN(review_id)) {
+    return Promise.reject({ status: 400, msg: "review_id is not a number" });
+  }
+  return db
+    .query("SELECT * FROM reviews WHERE review_id = $1", [review_id])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "review_id is not found" });
+      } else {
+        return result.rows[0];
+      }
+    });
+};
