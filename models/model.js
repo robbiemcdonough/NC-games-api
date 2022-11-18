@@ -46,23 +46,58 @@ exports.fetchCommentsByReviewID = (review_id) => {
 };
 
 exports.insertCommentsByReviewID = (newComment, review_id) => {
+  if (isNaN(review_id)) {
+    return Promise.reject({ status: 400, msg: "review_id is not a number" });
+  }
+  if (
+    !newComment.hasOwnProperty("username") ||
+    !newComment.hasOwnProperty("body")
+  ) {
+    console.log('we are here')
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
   return db
-    .query("SELECT * FROM users WHERE username = $1", [newComment.username])
-    .then((array) => {
-      if (array.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "invalid username" });
-      } else {
-        return db
-          .query(
-            "INSERT INTO comments (body, review_id, author) VALUES ($1, $2, $3) RETURNING *;",
-            [newComment.body, review_id, newComment.username]
-          )
-          .then((result) => {
-            if(newComment.body.length === 0) {
-              return Promise.reject({status: 404, msg: 'comment body not found'})
-            }
-            return result.rows[0];
-          });
-      }
+    .query(
+      "INSERT INTO comments (body, review_id, author) VALUES ($1, $2, $3) RETURNING *;",
+      [newComment.body, review_id, newComment.username]
+    )
+    .then((result) => {
+      return result.rows[0];
     });
 };
+
+//   // return db
+//   //   .query("SELECT * FROM users WHERE username = $1", [newComment.username])
+//   //   .then((array) => {
+//   //     if (array.rows.length === 0) {
+//   //       return Promise.reject({ status: 404, msg: "invalid username" });
+//   //     } else {
+
+//         return db
+//           .query(
+//   "INSERT INTO comments (body, review_id, author) VALUES ($1, $2, $3) RETURNING *;",
+//   [newComment.body, review_id, newComment.username]
+// )
+//           .then((result) => {
+//             if (result.rows.length === 0) {
+//               return Promise.reject({
+//                 status: 404,
+//                 msg: "review_id is not found",
+//               });
+//             } else if (newComment.body.length === 0) {
+//               return Promise.reject({
+//                 status: 404,
+//                 msg: "comment body not found",
+//               });
+//             } else if (newComment.hasOwnProperty(!'body')) {
+//               return Promise.reject({
+//                 status: 404,
+//                 msg: "missing username",
+//               });
+//             }
+//             return result.rows[0];
+//           });
+//       }
+//     });
+// };

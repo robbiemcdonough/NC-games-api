@@ -7,6 +7,7 @@ const {
   getReviewsByID,
   getCommentsByReviewID,
   postCommentsByReviewID,
+  patchVotesByReviewID,
 } = require("./controllers/controller");
 
 app.use(express.json());
@@ -17,6 +18,19 @@ app.get("/api/reviews/:review_id", getReviewsByID);
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewID);
 
 app.post("/api/reviews/:review_id/comments", postCommentsByReviewID);
+
+// app.patch('/api/reviews/:review_id', patchVotesByReviewID)
+
+app.use((err, req, res, next) => {
+  if (err.code === "23503" && err.detail.includes("reviews")) {
+    res.status(404).send({ msg: "review_id is not found" });
+  }
+  if (err.code === "23503") {
+    res.status(400).send({ msg: "invalid username" });
+  } else {
+    next(err);
+  }
+});
 
 app.use((err, req, res, next) => {
   if (err.status && err.msg) {

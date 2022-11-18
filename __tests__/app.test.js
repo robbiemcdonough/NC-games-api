@@ -3,7 +3,6 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
-const { get, post } = require("../app");
 
 beforeEach(() => {
   return seed(testData);
@@ -159,23 +158,52 @@ describe("POST a comment to given review", () => {
         });
       });
   });
-  test("404 username is invalid", () => {
+  test("400 username is invalid", () => {
     const REVIEW_ID = 2;
     return request(app)
-      .post(`/api/reviews/${REVIEW_ID}/comments`).send({ username:'robbie', body:'hello'})
-      .expect(404)
+      .post(`/api/reviews/${REVIEW_ID}/comments`)
+      .send({ username: "robbie", body: "hello" })
+      .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("invalid username");
       });
   });
-  test("404 comment body not found", () => {
+  test("400 bad request", () => {
     const REVIEW_ID = 2;
     return request(app)
       .post(`/api/reviews/${REVIEW_ID}/comments`)
-      .send({ username: "bainesface", body: "" })
+      .send({ username: "bainesface" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+  test("400 review_id is not a number", () => {
+    return request(app)
+      .post("/api/reviews/banana/comments")
+      .send({ username: "bainesface", body: "hello" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("review_id is not a number");
+      });
+  });
+  test("404 review_id is an invalid number", () => {
+    return request(app)
+      .post("/api/reviews/10000/comments")
+      .send({ username: "bainesface", body: "hello" })
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("comment body not found");
+        expect(res.body.msg).toBe("review_id is not found");
+      });
+  });
+  test("400 bad request", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({ body: "hello" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
       });
   });
 });
+// describe("PATCH number of votes to given review");
