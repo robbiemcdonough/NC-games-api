@@ -44,3 +44,25 @@ exports.fetchCommentsByReviewID = (review_id) => {
       }
     });
 };
+
+exports.insertCommentsByReviewID = (newComment, review_id) => {
+  return db
+    .query("SELECT * FROM users WHERE username = $1", [newComment.username])
+    .then((array) => {
+      if (array.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "invalid username" });
+      } else {
+        return db
+          .query(
+            "INSERT INTO comments (body, review_id, author) VALUES ($1, $2, $3) RETURNING *;",
+            [newComment.body, review_id, newComment.username]
+          )
+          .then((result) => {
+            if(newComment.body.length === 0) {
+              return Promise.reject({status: 404, msg: 'comment body not found'})
+            }
+            return result.rows[0];
+          });
+      }
+    });
+};

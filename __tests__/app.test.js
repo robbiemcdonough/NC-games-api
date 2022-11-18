@@ -3,7 +3,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
-const { get } = require("../app");
+const { get, post } = require("../app");
 
 beforeEach(() => {
   return seed(testData);
@@ -138,6 +138,44 @@ describe("/api/review/:review_id/comments", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("review_id is not found");
+      });
+  });
+});
+describe("POST a comment to given review", () => {
+  test("POST 201 responds with posted comment", () => {
+    const REVIEW_ID = 2;
+    return request(app)
+      .post(`/api/reviews/${REVIEW_ID}/comments`)
+      .send({ username: "bainesface", body: "hello" })
+      .expect(201)
+      .then((res) => {
+        expect(res.body.comment).toMatchObject({
+          comment_id: expect.any(Number),
+          body: expect.any(String),
+          review_id: REVIEW_ID,
+          author: expect.any(String),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("404 username is invalid", () => {
+    const REVIEW_ID = 2;
+    return request(app)
+      .post(`/api/reviews/${REVIEW_ID}/comments`).send({ username:'robbie', body:'hello'})
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("invalid username");
+      });
+  });
+  test("404 comment body not found", () => {
+    const REVIEW_ID = 2;
+    return request(app)
+      .post(`/api/reviews/${REVIEW_ID}/comments`)
+      .send({ username: "bainesface", body: "" })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("comment body not found");
       });
   });
 });
