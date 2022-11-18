@@ -3,6 +3,7 @@ const {
   fetchReviews,
   fetchReviewsByID,
   fetchCommentsByReviewID,
+  insertCommentsByReviewID,
 } = require("../models/model");
 
 exports.getCategories = (req, res, next) => {
@@ -34,3 +35,22 @@ exports.getCommentsByReviewID = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.postCommentsByReviewID = (req, res, next) => {
+  const { review_id } = req.params;
+  insertCommentsByReviewID(req.body, review_id)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      console.log(err)
+      next(err)
+    });
+};
+
+// exports.patchVotesByReviewID = (req, res, next) => {
+//   const { review_id } = req.params;
+//   insertVotesByReviewID(req.body, review_id).then((vote) => {
+//     res.status(200).send({ vote })
+//   }).catch(next)
+// };

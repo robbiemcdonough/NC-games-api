@@ -6,5 +6,7 @@
 -- ORDER BY created_at DESC;
 
 
-SELECT * FROM comments WHERE review_id = 2
-ORDER BY created_at DESC;
+-- SELECT * FROM comments WHERE review_id = 2
+-- ORDER BY created_at DESC;
+
+INSERT INTO comments () VALUES ()
