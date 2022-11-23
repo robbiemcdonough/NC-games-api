@@ -140,7 +140,7 @@ describe("/api/review/:review_id/comments", () => {
       });
   });
 });
-describe("POST a comment to given review", () => {
+describe("POST /api/reviews/:review_id/comments", () => {
   test("POST 201 responds with posted comment", () => {
     const REVIEW_ID = 2;
     return request(app)
@@ -206,4 +206,53 @@ describe("POST a comment to given review", () => {
       });
   });
 });
-// describe("PATCH number of votes to given review");
+describe("PATCH /api/reviews/review_id", () => {
+  test("200 update vote count by 1", () => {
+    const REVIEW_ID = 2;
+    return request(app)
+      .patch(`/api/reviews/${REVIEW_ID}`)
+      .send({ inc_vote: 1 })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.vote).toMatchObject({
+          review_id: REVIEW_ID,
+          title: expect.any(String),
+          category: expect.any(String),
+          designer: expect.any(String),
+          owner: expect.any(String),
+          review_body: expect.any(String),
+          review_img_url: expect.any(String),
+          created_at: expect.any(String),
+          votes: 6,
+        });
+      });
+  });
+  test("200 decrement vote count to negative integer", () => {
+    const REVIEW_ID = 2;
+    return request(app)
+      .patch(`/api/reviews/${REVIEW_ID}`)
+      .send({ inc_vote: -105 })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.vote.votes).toBe(-100);
+      });
+  });
+  test("400 review_id not a number", () => {
+    return request(app)
+      .patch("/api/reviews/banana")
+      .send({ inc_vote: 1 })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("review_id is not a number");
+      });
+  });
+  test("400 bad request when sent object with no inc_vote key", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({ vote: 1 })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+});

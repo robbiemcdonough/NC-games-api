@@ -53,7 +53,6 @@ exports.insertCommentsByReviewID = (newComment, review_id) => {
     !newComment.hasOwnProperty("username") ||
     !newComment.hasOwnProperty("body")
   ) {
-    console.log('we are here')
     return Promise.reject({ status: 400, msg: "bad request" });
   }
 
@@ -67,37 +66,19 @@ exports.insertCommentsByReviewID = (newComment, review_id) => {
     });
 };
 
-//   // return db
-//   //   .query("SELECT * FROM users WHERE username = $1", [newComment.username])
-//   //   .then((array) => {
-//   //     if (array.rows.length === 0) {
-//   //       return Promise.reject({ status: 404, msg: "invalid username" });
-//   //     } else {
-
-//         return db
-//           .query(
-//   "INSERT INTO comments (body, review_id, author) VALUES ($1, $2, $3) RETURNING *;",
-//   [newComment.body, review_id, newComment.username]
-// )
-//           .then((result) => {
-//             if (result.rows.length === 0) {
-//               return Promise.reject({
-//                 status: 404,
-//                 msg: "review_id is not found",
-//               });
-//             } else if (newComment.body.length === 0) {
-//               return Promise.reject({
-//                 status: 404,
-//                 msg: "comment body not found",
-//               });
-//             } else if (newComment.hasOwnProperty(!'body')) {
-//               return Promise.reject({
-//                 status: 404,
-//                 msg: "missing username",
-//               });
-//             }
-//             return result.rows[0];
-//           });
-//       }
-//     });
-// };
+exports.updateVotesByReviewID = (vote, review_id) => {
+  if (isNaN(review_id)) {
+    return Promise.reject({ status: 400, msg: "review_id is not a number" });
+  }
+  if (!vote.hasOwnProperty("inc_vote")) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+  return db
+    .query(
+      `UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *`,
+      [vote.inc_vote, review_id]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};
