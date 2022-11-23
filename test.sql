@@ -9,4 +9,4 @@
 -- SELECT * FROM comments WHERE review_id = 2
 -- ORDER BY created_at DESC;
 
-INSERT INTO comments () VALUES ()
+UPDATE reviews SET votes = votes + 1 WHERE review_id = 2 RETURNING *;

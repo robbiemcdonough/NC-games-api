@@ -19,7 +19,7 @@ app.get("/api/reviews/:review_id/comments", getCommentsByReviewID);
 
 app.post("/api/reviews/:review_id/comments", postCommentsByReviewID);
 
-// app.patch('/api/reviews/:review_id', patchVotesByReviewID)
+app.patch("/api/reviews/:review_id", patchVotesByReviewID);
 
 app.use((err, req, res, next) => {
   if (err.code === "23503" && err.detail.includes("reviews")) {
