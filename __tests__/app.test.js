@@ -214,7 +214,7 @@ describe("PATCH /api/reviews/review_id", () => {
       .send({ inc_vote: 1 })
       .expect(200)
       .then((res) => {
-        expect(res.body.vote).toMatchObject({
+        expect(res.body.review).toMatchObject({
           review_id: REVIEW_ID,
           title: expect.any(String),
           category: expect.any(String),
@@ -234,7 +234,7 @@ describe("PATCH /api/reviews/review_id", () => {
       .send({ inc_vote: -105 })
       .expect(200)
       .then((res) => {
-        expect(res.body.vote.votes).toBe(-100);
+        expect(res.body.review.votes).toBe(-100);
       });
   });
   test("400 review_id not a number", () => {
@@ -253,6 +253,24 @@ describe("PATCH /api/reviews/review_id", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("bad request");
+      });
+  });
+  test("400 bad request when inc_vote value is NaN", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({ inc_vote: "banana" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("bad request");
+      });
+  });
+  test("404 when review_id number is invalid", () => {
+    return request(app)
+      .patch("/api/reviews/10000")
+      .send({ inc_vote: 1 })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("review_id is not found");
       });
   });
 });

@@ -66,19 +66,26 @@ exports.insertCommentsByReviewID = (newComment, review_id) => {
     });
 };
 
-exports.updateVotesByReviewID = (vote, review_id) => {
+exports.updateVotesByReviewID = (review, review_id) => {
   if (isNaN(review_id)) {
     return Promise.reject({ status: 400, msg: "review_id is not a number" });
   }
-  if (!vote.hasOwnProperty("inc_vote")) {
+  if (!review.hasOwnProperty("inc_vote")) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+  if (isNaN(review.inc_vote)) {
     return Promise.reject({ status: 400, msg: "bad request" });
   }
   return db
     .query(
       `UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *`,
-      [vote.inc_vote, review_id]
+      [review.inc_vote, review_id]
     )
     .then((result) => {
-      return result.rows[0];
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "review_id is not found" });
+      } else {
+        return result.rows[0];
+      }
     });
 };
