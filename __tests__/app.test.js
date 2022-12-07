@@ -131,14 +131,14 @@ describe("/api/review/:review_id/comments", () => {
         expect(res.body.msg).toBe("review_id is not a number");
       });
   });
-  test("404 review_id is an invalid number", () => {
-    return request(app)
-      .get("/api/reviews/10000/comments")
-      .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("review_id is not found");
-      });
-  });
+  // test("404 review_id is an invalid number", () => {
+  //   return request(app)
+  //     .get("/api/reviews/10000/comments")
+  //     .expect(404)
+  //     .then((res) => {
+  //       expect(res.body.msg).toBe("review_id is not found");
+  //     });
+  // });
 });
 describe("POST /api/reviews/:review_id/comments", () => {
   test("POST 201 responds with posted comment", () => {
