@@ -50,6 +50,7 @@ exports.insertCommentsByReviewID = (newComment, review_id) => {
     return Promise.reject({ status: 400, msg: "review_id is not a number" });
   }
   if (
+    !newComment.body ||
     !newComment.hasOwnProperty("username") ||
     !newComment.hasOwnProperty("body")
   ) {
